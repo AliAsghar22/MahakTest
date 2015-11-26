@@ -183,7 +183,6 @@ public class Indexer {
                 percsiontat15 /= 30;
                 percsiontat5 /= 10;
                 System.out.println("p@5:"+percsiontat5+"---p@10:"+percsiontat10+"---p@15"+percsiontat15);
-
             }
 
         } catch (Exception e) {

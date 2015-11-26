@@ -3,6 +3,7 @@
   <component name="EntryPointsManager">
     <entry_points version="2.0" />
   </component>
+  <component name="IdProvider" IDEtalkID="0C33E688B75A670F2E94EC47473FF6A8" />
   <component name="ProjectKey">
     <option name="state" value="project://e2804f05-5315-4fc6-a121-c522a6c26470" />
   </component>
@@ -10,3 +11,4 @@
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>
+

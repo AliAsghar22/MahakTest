@@ -149,6 +149,13 @@ public class Indexer {
                 qid++;
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
+                Cell main = (Cell) cellIterator.next();
+                String qeryId = main.getStringCellValue();
+                System.out.println("queryID "+qid);
+                Map<String, Integer> map = relevant.get(String.valueOf(qid));
+                System.out.println(map);
+                //System.out.println(map);
+                ArrayList<String> names = search(main.getStringCellValue(), 20);
                 Cell main = (Cell) cellIterator.next();//main = query
 
                 Map<String, Integer> map = relevant.get(String.valueOf(qid)); // a map of relevant news numbers

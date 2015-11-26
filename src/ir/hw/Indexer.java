@@ -106,7 +106,7 @@ public class Indexer {
                 String query =String.valueOf((int)queryId.getNumericCellValue());
                 String news = String.valueOf((int)newsId.getNumericCellValue());
                 int relev = (int) relavancy.getNumericCellValue();
-                if(relavancy.getNumericCellValue() > 1)
+                System.out.println(query);
                     if(relevant.get(query) == null) {
                         Map<String, Integer> map = new HashMap<>();
                         map.put(news, relev);

@@ -207,6 +207,7 @@ public class Indexer {
 
                 recall /= num2;
 
+                float fmeasure = 2*recall*wholepersc/(wholepersc + recall);
 
             }
 

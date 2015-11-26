@@ -138,6 +138,7 @@ public class Indexer {
         Iterator rowIterator;
         Iterator cellIterator;
         Row row = null;
+
         try {
             //reading exel file
             inputStream = new FileInputStream("queries.xls");
@@ -149,17 +150,13 @@ public class Indexer {
                 qid++;
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
-                Cell main = (Cell) cellIterator.next();
+                Cell main = (Cell) cellIterator.next();//main = query
                 String qeryId = main.getStringCellValue();
                 System.out.println("queryID "+qid);
-                Map<String, Integer> map = relevant.get(String.valueOf(qid));
-                System.out.println(map);
-                //System.out.println(map);
-                ArrayList<String> names = search(main.getStringCellValue(), 20);
-                Cell main = (Cell) cellIterator.next();//main = query
-
                 Map<String, Integer> map = relevant.get(String.valueOf(qid)); // a map of relevant news numbers
+                System.out.println(map);
                 ArrayList<String> names = search(main.getStringCellValue(), 20);// the results of search
+
 
                 // beginning test of results
                 // percision at 5
@@ -190,6 +187,8 @@ public class Indexer {
                 percsiontat15 /= 30;
                 percsiontat5 /= 10;
                 System.out.println("p@5:"+percsiontat5+"---p@10:"+percsiontat10+"---p@15"+percsiontat15);
+
+
             }
 
         } catch (Exception e) {

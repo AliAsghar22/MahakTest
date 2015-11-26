@@ -1,5 +1,6 @@
 package ir.hw;
 
+import com.sun.org.apache.regexp.internal.recompile;
 import org.apache.lucene.analysis.fa.PersianAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -16,6 +17,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -130,6 +132,7 @@ public class Indexer {
 
         FileInputStream inputStream;
         HSSFWorkbook workbook;
+        HSSFWorkbook results;
         Sheet sheet;
         Iterator rowIterator;
         Iterator cellIterator;
@@ -138,6 +141,8 @@ public class Indexer {
         try {
             inputStream = new FileInputStream("queries.xls");
             workbook = new HSSFWorkbook(inputStream);
+            results=new HSSFWorkbook();
+            HSSFSheet sheet1=results.createSheet("infos");
             sheet = workbook.getSheetAt(0);
             rowIterator = sheet.iterator();
             int qid=0;

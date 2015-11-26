@@ -232,6 +232,25 @@ public class Indexer {
 
                 recall /= num2;
 
+                float fmeasure = 2*recall*wholepersc/(wholepersc + recall);
+
+                int makhraj = map.size();
+
+                float ratio = 0;
+                int soorat = 0;
+                for(int i = 0; i < 20; i++){
+                    soorat = 0;
+                    ArrayList<String> temp = new ArrayList<>(names.subList(0, i));
+                    for(String s: temp){
+                        if (map.containsKey(s)) {
+                            soorat += map.get(s);
+                        }
+                    }
+                    ratio += soorat/(i*2);
+                }
+
+                float mapMeasure = ratio/makhraj;
+
 
 
             }

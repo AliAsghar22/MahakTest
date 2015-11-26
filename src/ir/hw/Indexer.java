@@ -156,7 +156,7 @@ public class Indexer {
                 Map<String, Integer> map = relevant.get(String.valueOf(qid));
                 System.out.println(map);
                 //System.out.println(map);
-                ArrayList<String> names = search(main.getStringCellValue(), 30);
+                ArrayList<String> names = search(main.getStringCellValue(), 20);
                 ArrayList<String> pat5  =new ArrayList<>(names.subList(0,5));
                 float percsiontat5 = 0;
                 for(String s: pat5){

@@ -16,6 +16,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -138,6 +139,8 @@ public class Indexer {
         Iterator rowIterator;
         Iterator cellIterator;
         Row row = null;
+        HSSFWorkbook results =new HSSFWorkbook();
+        HSSFSheet sheet1=results.createSheet("resultsset");
 
         try {
             //reading exel file
@@ -145,8 +148,30 @@ public class Indexer {
             workbook = new HSSFWorkbook(inputStream);
             sheet = workbook.getSheetAt(0);
             rowIterator = sheet.iterator();
+            int rowcounter=0;
+            Row row1=sheet1.createRow(++rowcounter);
+            int column=0;
+            Cell cell=row1.createCell(++column);
+            cell.setCellValue("query id");
+            cell=row1.createCell(++column);
+            cell.setCellValue("p@5");
+            cell=row1.createCell(++column);
+            cell.setCellValue("p@10");
+            cell=row1.createCell(++column);
+            cell.setCellValue("p@15");
+            cell=row1.createCell(++column);
+            cell.setCellValue("p@5");
+            cell=row1.createCell(++column);
+            cell.setCellValue("Whole Precision");
+            cell=row1.createCell(++column);
+            cell.setCellValue("recall");
+            cell=row1.createCell(++column);
+            cell.setCellValue("f measure");
+            cell=row1.createCell(++column);
+            cell.setCellValue("MAP");
             int qid = 0;
             while (rowIterator.hasNext()) {
+
                 qid++;
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
@@ -206,6 +231,7 @@ public class Indexer {
                     num2 += map.get(s);
 
                 recall /= num2;
+
 
 
             }

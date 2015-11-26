@@ -35,6 +35,8 @@ import java.util.Map;
  */
 public class Indexer {
 
+    public HashMap<String, Map<String, Integer>> relevant;
+
     public void cleanIndex() {
         new File("index").delete();
     }
@@ -83,8 +85,9 @@ public class Indexer {
 
 
     public void makeRelevantsHashMap(){
+        //key = queryID
+        //value = a hashMap of relevant news id * relevancy
         relevant = new HashMap<>();
-
         FileInputStream inputStream;
         HSSFWorkbook workbook;
         Sheet sheet;
@@ -106,7 +109,6 @@ public class Indexer {
                 String query =String.valueOf((int)queryId.getNumericCellValue());
                 String news = String.valueOf((int)newsId.getNumericCellValue());
                 int relev = (int) relavancy.getNumericCellValue();
-                System.out.println(query);
                     if(relevant.get(query) == null) {
                         Map<String, Integer> map = new HashMap<>();
                         map.put(news, relev);
@@ -124,9 +126,11 @@ public class Indexer {
             e.printStackTrace();
         }
     }
-    public HashMap<String, Map<String, Integer>> relevant;
+
 
     public void compute(){
+        // the hashMap of relevancy should be created first
+        // the queries are rode from exel file and searched one by one and then the results are tested for each query
 
         FileInputStream inputStream;
         HSSFWorkbook workbook;
@@ -134,8 +138,8 @@ public class Indexer {
         Iterator rowIterator;
         Iterator cellIterator;
         Row row = null;
-
         try {
+            //reading exel file
             inputStream = new FileInputStream("queries.xls");
             workbook = new HSSFWorkbook(inputStream);
             sheet = workbook.getSheetAt(0);
@@ -145,21 +149,21 @@ public class Indexer {
                 qid++;
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
-                Cell main = (Cell) cellIterator.next();
-                String qeryId = main.getStringCellValue();
-                System.out.println("queryID "+qid);
-                Map<String, Integer> map = relevant.get(String.valueOf(qid));
-                System.out.println(map);
-                //System.out.println(map);
-                ArrayList<String> names = search(main.getStringCellValue(), 30);
+                Cell main = (Cell) cellIterator.next();//main = query
+
+                Map<String, Integer> map = relevant.get(String.valueOf(qid)); // a map of relevant news numbers
+                ArrayList<String> names = search(main.getStringCellValue(), 20);// the results of search
+
+                // beginning test of results
+                // percision at 5
                 ArrayList<String> pat5  =new ArrayList<>(names.subList(0,5));
                 float percsiontat5 = 0;
                 for(String s: pat5){
                     if(map.containsKey(s)){
-                        System.out.println(map.get(s));
                         percsiontat5 += map.get(s);
                     }
                 }
+                // percision at 10
                 ArrayList<String> pat10  = new ArrayList<>(names.subList(0, 10 ));
                 float percsiontat10 = 0;
                 for(String s: pat10){
@@ -167,6 +171,7 @@ public class Indexer {
                         percsiontat10 += map.get(s);
                     }
                 }
+                // percision at 15
                 float percsiontat15 = 0;
                 ArrayList<String> pat15  = new ArrayList<>(names.subList(0,15 ));
                 for(String s: pat15){

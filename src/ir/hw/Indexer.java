@@ -50,7 +50,7 @@ public class Indexer {
         try {
             indexDir = FSDirectory.open(new File(indexPath).toPath());
             writer = new IndexWriter(indexDir, cfg);
-            for(File f : new File(documentsPath).listFiles()){
+            for (File f : new File(documentsPath).listFiles()) {
                 Document doc = new Document();
                 String main = new String(Files.readAllBytes(f.toPath()));
                 doc.add(new TextField("text", main, org.apache.lucene.document.Field.Store.YES));
@@ -65,7 +65,7 @@ public class Indexer {
         }
     }
 
-    public ArrayList<String> search(String q, int count){
+    public ArrayList<String> search(String q, int count) {
         try {
             ArrayList<String> names = new ArrayList<>();
             IndexReader rdr = DirectoryReader.open(FSDirectory.open(new File("index").toPath()));
@@ -84,7 +84,7 @@ public class Indexer {
     }
 
 
-    public void makeRelevantsHashMap(){
+    public void makeRelevantsHashMap() {
         //key = queryID
         //value = a hashMap of relevant news id * relevancy
         relevant = new HashMap<>();
@@ -104,20 +104,20 @@ public class Indexer {
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
                 Cell queryId = (Cell) cellIterator.next();
-                Cell newsId = (Cell)cellIterator.next();
-                Cell relavancy = (Cell)cellIterator.next();
-                String query =String.valueOf((int)queryId.getNumericCellValue());
-                String news = String.valueOf((int)newsId.getNumericCellValue());
+                Cell newsId = (Cell) cellIterator.next();
+                Cell relavancy = (Cell) cellIterator.next();
+                String query = String.valueOf((int) queryId.getNumericCellValue());
+                String news = String.valueOf((int) newsId.getNumericCellValue());
                 int relev = (int) relavancy.getNumericCellValue();
-                    if(relevant.get(query) == null) {
-                        Map<String, Integer> map = new HashMap<>();
-                        map.put(news, relev);
-                        relevant.put(query,map);
-                    }else {
-                        Map<String, Integer> map = relevant.get(query);
-                        map.put(news, relev);
-                        relevant.put(query, map);
-                    }
+                if (relevant.get(query) == null) {
+                    Map<String, Integer> map = new HashMap<>();
+                    map.put(news, relev);
+                    relevant.put(query, map);
+                } else {
+                    Map<String, Integer> map = relevant.get(query);
+                    map.put(news, relev);
+                    relevant.put(query, map);
+                }
 
             }
 
@@ -128,7 +128,7 @@ public class Indexer {
     }
 
 
-    public void compute(){
+    public void compute() {
         // the hashMap of relevancy should be created first
         // the queries are rode from exel file and searched one by one and then the results are tested for each query
 
@@ -145,14 +145,14 @@ public class Indexer {
             workbook = new HSSFWorkbook(inputStream);
             sheet = workbook.getSheetAt(0);
             rowIterator = sheet.iterator();
-            int qid=0;
+            int qid = 0;
             while (rowIterator.hasNext()) {
                 qid++;
                 row = (Row) rowIterator.next();
                 cellIterator = row.cellIterator();
                 Cell main = (Cell) cellIterator.next();//main = query
                 String qeryId = main.getStringCellValue();
-                System.out.println("queryID "+qid);
+                System.out.println("queryID " + qid);
                 Map<String, Integer> map = relevant.get(String.valueOf(qid)); // a map of relevant news numbers
                 System.out.println(map);
                 ArrayList<String> names = search(main.getStringCellValue(), 20);// the results of search
@@ -160,40 +160,52 @@ public class Indexer {
 
                 // beginning test of results
                 // percision at 5
-                ArrayList<String> pat5  =new ArrayList<>(names.subList(0,5));
+                ArrayList<String> pat5 = new ArrayList<>(names.subList(0, 5));
                 float percsiontat5 = 0;
-                for(String s: pat5){
-                    if(map.containsKey(s)){
+                for (String s : pat5) {
+                    if (map.containsKey(s)) {
                         percsiontat5 += map.get(s);
                     }
                 }
                 // percision at 10
-                ArrayList<String> pat10  = new ArrayList<>(names.subList(0, 10 ));
+                ArrayList<String> pat10 = new ArrayList<>(names.subList(0, 10));
                 float percsiontat10 = 0;
-                for(String s: pat10){
-                    if(map.containsKey(s)){
+                for (String s : pat10) {
+                    if (map.containsKey(s)) {
                         percsiontat10 += map.get(s);
                     }
                 }
                 // percision at 15
                 float percsiontat15 = 0;
-                ArrayList<String> pat15  = new ArrayList<>(names.subList(0,15 ));
-                for(String s: pat15){
-                    if(map.containsKey(s)){
+                ArrayList<String> pat15 = new ArrayList<>(names.subList(0, 15));
+                for (String s : pat15) {
+                    if (map.containsKey(s)) {
                         percsiontat15 += map.get(s);
                     }
                 }
-                float wholepersc=0;
-                for(String s:names){
-                    if (map.containsKey(s)){
-                        wholepersc+=map.get(s);
+                float wholepersc = 0;
+                for (String s : names) {
+                    if (map.containsKey(s)) {
+                        wholepersc += map.get(s);
                     }
                 }
                 percsiontat10 /= 20;
                 percsiontat15 /= 30;
                 percsiontat5 /= 10;
-                wholepersc /=40;
+                wholepersc /= 40;
 //                System.out.println("p@5:"+percsiontat5+"---p@10:"+percsiontat10+"---p@15"+percsiontat15);
+
+                float recall = 0;
+                for (String s : names) {
+                    if (map.containsKey(s)) {
+                        recall += map.get(s);
+                    }
+                }
+                int num2 = 0;
+                for (String s : map.keySet())
+                    num2 += map.get(s);
+
+                recall /= num2;
 
 
             }
@@ -203,10 +215,7 @@ public class Indexer {
         }
 
 
-
     }
-
-
 
 
 }

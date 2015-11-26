@@ -1,6 +1,10 @@
 package ir.hw;
 
+import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.core.StopFilter;
 import org.apache.lucene.analysis.fa.PersianAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.standard.StandardTokenizer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -16,20 +20,16 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Taghizadeh on 11/25/2015.
@@ -58,7 +58,6 @@ public class Indexer {
                 doc.add(new StringField("name", f.getName().replace("out", "").replace(".txt", ""), Field.Store.YES));
                 writer.addDocument(doc);
             }
-
             writer.close();
 
         } catch (Exception e) {
@@ -148,9 +147,9 @@ public class Indexer {
             workbook = new HSSFWorkbook(inputStream);
             sheet = workbook.getSheetAt(0);
             rowIterator = sheet.iterator();
-            int rowcounter=0;
+            int rowcounter=-1;
             Row row1=sheet1.createRow(++rowcounter);
-            int column=0;
+            int column=-1;
             Cell cell=row1.createCell(++column);
             cell.setCellValue("query id");
             cell=row1.createCell(++column);
@@ -160,8 +159,6 @@ public class Indexer {
             cell=row1.createCell(++column);
             cell.setCellValue("p@15");
             cell=row1.createCell(++column);
-            cell.setCellValue("p@5");
-            cell=row1.createCell(++column);
             cell.setCellValue("Whole Precision");
             cell=row1.createCell(++column);
             cell.setCellValue("recall");
@@ -170,6 +167,7 @@ public class Indexer {
             cell=row1.createCell(++column);
             cell.setCellValue("MAP");
             int qid = 0;
+            float whole_f_measure=0;
             while (rowIterator.hasNext()) {
 
                 qid++;
@@ -177,9 +175,9 @@ public class Indexer {
                 cellIterator = row.cellIterator();
                 Cell main = (Cell) cellIterator.next();//main = query
                 String qeryId = main.getStringCellValue();
-                System.out.println("queryID " + qid);
+               // System.out.println("queryID " + qid);
                 Map<String, Integer> map = relevant.get(String.valueOf(qid)); // a map of relevant news numbers
-                System.out.println(map);
+              //  System.out.println(map);
                 ArrayList<String> names = search(main.getStringCellValue(), 20);// the results of search
 
 
@@ -231,8 +229,9 @@ public class Indexer {
                     num2 += map.get(s);
 
                 recall /= num2;
-
-                float fmeasure = 2*recall*wholepersc/(wholepersc + recall);
+                float fmeasure=0;
+                if (wholepersc + recall!=0)
+                    fmeasure = 2*recall*wholepersc/(wholepersc + recall);
 
                 int makhraj = map.size();
 
@@ -240,20 +239,45 @@ public class Indexer {
                 int soorat = 0;
                 for(int i = 0; i < 20; i++){
                     soorat = 0;
-                    ArrayList<String> temp = new ArrayList<>(names.subList(0, i));
+                    ArrayList<String> temp = new ArrayList<>(names.subList(0, i+1));
                     for(String s: temp){
                         if (map.containsKey(s)) {
                             soorat += map.get(s);
                         }
                     }
+                    if (i!=0)
                     ratio += soorat/(i*2);
                 }
+                column=-1;
+                float mapMeasure=0;
+                if(makhraj!=0)
+                    mapMeasure = ratio/makhraj;
 
-                float mapMeasure = ratio/makhraj;
-
-
+                whole_f_measure+=fmeasure;
+               // System.out.println(fmeasure);
+                row1=sheet1.createRow(++rowcounter);
+                cell=row1.createCell(++column);
+                cell.setCellValue(qid);
+                cell=row1.createCell(++column);
+                cell.setCellValue(percsiontat5);
+                cell=row1.createCell(++column);
+                cell.setCellValue(percsiontat10);
+                cell=row1.createCell(++column);
+                cell.setCellValue(percsiontat15);
+                cell=row1.createCell(++column);
+                cell.setCellValue(wholepersc);
+                cell=row1.createCell(++column);
+                cell.setCellValue(recall);
+                cell=row1.createCell(++column);
+                cell.setCellValue(fmeasure);
+                cell=row1.createCell(++column);
+                cell.setCellValue(mapMeasure);
+                try (FileOutputStream outputStream = new FileOutputStream("res.xls")) {
+                    results.write(outputStream);
+                }
 
             }
+            System.out.println(whole_f_measure/216);
 
         } catch (Exception e) {
             e.printStackTrace();

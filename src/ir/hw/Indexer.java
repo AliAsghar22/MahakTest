@@ -168,6 +168,7 @@ public class Indexer {
             cell.setCellValue("MAP");
             int qid = 0;
             float whole_f_measure=0;
+            float wholeMap=0;
             while (rowIterator.hasNext()) {
 
                 qid++;
@@ -233,10 +234,10 @@ public class Indexer {
                 if (wholepersc + recall!=0)
                     fmeasure = 2*recall*wholepersc/(wholepersc + recall);
 
-                int makhraj = map.size();
+                float makhraj = map.size();
 
                 float ratio = 0;
-                int soorat = 0;
+                float soorat = 0;
                 for(int i = 0; i < 20; i++){
                     soorat = 0;
                     ArrayList<String> temp = new ArrayList<>(names.subList(0, i+1));
@@ -254,6 +255,8 @@ public class Indexer {
                     mapMeasure = ratio/makhraj;
 
                 whole_f_measure+=fmeasure;
+                wholeMap+=mapMeasure;
+
                // System.out.println(fmeasure);
                 row1=sheet1.createRow(++rowcounter);
                 cell=row1.createCell(++column);
@@ -277,7 +280,8 @@ public class Indexer {
                 }
 
             }
-            System.out.println(whole_f_measure/216);
+            System.out.println("fMeasure AVG :"+whole_f_measure/216);
+            System.out.println("MAP AVG : "+wholeMap/216);
 
         } catch (Exception e) {
             e.printStackTrace();
